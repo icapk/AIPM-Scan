@@ -1,10 +1,10 @@
-# AIPM-Scan Dependencies (Streamlit + OpenAI 兼容版本)
-
-streamlit==1.31.0
+# 删除版本限制，让 Cloud 自动选择兼容版本
+streamlit
 openai>=1.0.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
-python-dotenv==1.0.0
-pandas==2.2.0
-httpx==0.28.1
-SQLAlchemy==2.0.45
+pydantic
+pydantic-settings
+python-dotenv
+pandas
+httpx
+plotly
+streamlit-ant-design-components
