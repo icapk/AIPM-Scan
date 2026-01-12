@@ -1,0 +1,10 @@
+# 删除版本限制，让 Cloud 自动选择兼容版本
+streamlit
+openai>=1.0.0
+pydantic
+pydantic-settings
+python-dotenv
+pandas
+httpx
+plotly
+streamlit-ant-design-components

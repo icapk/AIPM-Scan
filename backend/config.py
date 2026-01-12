@@ -11,6 +11,29 @@ BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
 
 
+def get_secret(key: str, default: str = "") -> str:
+    """
+    获取配置值，优先级：
+    1. 环境变量
+    2. Streamlit secrets (用于 Streamlit Cloud)
+    3. 默认值
+    """
+    # 先检查环境变量
+    value = os.environ.get(key)
+    if value:
+        return value
+    
+    # 再检查 Streamlit secrets
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        pass
+    
+    return default
+
+
 class Settings(BaseSettings):
     """应用配置"""
     
@@ -32,6 +55,18 @@ class Settings(BaseSettings):
     class Config:
         env_file = str(ENV_FILE)
         env_file_encoding = "utf-8"
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # 如果 pydantic 没有从 .env 读取到值，尝试从 Streamlit secrets 读取
+        if not self.llm_api_key:
+            self.llm_api_key = get_secret("DEEPSEEK_API_KEY") or get_secret("LLM_API_KEY")
+        if not self.llm_base_url or self.llm_base_url == "https://api.deepseek.com":
+            self.llm_base_url = get_secret("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+        if not self.ragflow_api_key:
+            self.ragflow_api_key = get_secret("RAGFLOW_API_KEY")
+        if not self.ragflow_api_base or self.ragflow_api_base == "http://localhost:9380":
+            self.ragflow_api_base = get_secret("RAGFLOW_HOST", "http://localhost:9380")
 
 
 # 全局配置实例

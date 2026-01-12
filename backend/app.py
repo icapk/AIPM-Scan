@@ -26,15 +26,161 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自定义样式
+# 自定义样式 - Apple 风格简约设计
 st.markdown("""
 <style>
-    .main-header { font-size: 2.5rem; font-weight: 700; color: #1f77b4; text-align: center; margin-bottom: 0.5rem; }
-    .sub-header { font-size: 1.2rem; color: #666; text-align: center; margin-bottom: 2rem; }
-    .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 1rem; color: white; text-align: center; }
-    .metric-value { font-size: 2.5rem; font-weight: bold; }
-    .metric-label { font-size: 1rem; opacity: 0.9; }
-    .stProgress > div > div > div > div { background-color: #1f77b4; }
+    /* === 全局样式 === */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .stApp {
+        background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+    }
+    
+    /* === 侧边栏 === */
+    section[data-testid="stSidebar"] {
+        background: #ffffff;
+        border-right: 1px solid #e5e5e7;
+    }
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: #1d1d1f;
+    }
+    
+    /* === 主标题 === */
+    .main-header {
+        font-size: 3rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #1d1d1f;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    .sub-header {
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: #86868b;
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    /* === 卡片样式 === */
+    .metric-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 18px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        text-align: center;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .metric-value {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: #1d1d1f;
+        letter-spacing: -0.02em;
+    }
+    .metric-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* === 强调卡片 (渐变) === */
+    .metric-card-accent {
+        background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+        padding: 2rem;
+        border-radius: 18px;
+        text-align: center;
+        color: white;
+    }
+    .metric-card-accent .metric-value {
+        color: white;
+    }
+    .metric-card-accent .metric-label {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* === 按钮样式 === */
+    .stButton > button {
+        background: #007aff;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+    .stButton > button:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    }
+    .stButton > button:active {
+        transform: translateY(0);
+    }
+    
+    /* === 文本输入框 === */
+    .stTextArea textarea, .stTextInput input {
+        border: 1px solid #d2d2d7;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: #007aff;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+    
+    /* === 进度条 === */
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, #007aff, #5856d6);
+        border-radius: 10px;
+    }
+    
+    /* === 警告/成功/错误框 === */
+    .stAlert {
+        border-radius: 12px;
+        border: none;
+    }
+    
+    /* === 选择框和滑块 === */
+    .stSelectbox > div > div, .stSlider > div {
+        border-radius: 12px;
+    }
+    
+    /* === 分隔线 === */
+    hr {
+        border: none;
+        height: 1px;
+        background: #e5e5e7;
+        margin: 2rem 0;
+    }
+    
+    /* === 展开器 === */
+    .streamlit-expanderHeader {
+        font-weight: 600;
+        color: #1d1d1f;
+        border-radius: 12px;
+    }
+    
+    /* === 隐藏 Streamlit 默认元素 === */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* === 响应式调整 === */
+    @media (max-width: 768px) {
+        .main-header { font-size: 2rem; }
+        .metric-value { font-size: 2.5rem; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -222,7 +368,7 @@ def render_profile_view():
         match_score = profile.get("match_score")
         if match_score is not None:
              st.markdown(f"""
-            <div class="metric-card">
+            <div class="metric-card-accent">
                 <div class="metric-label">人岗匹配度</div>
                 <div class="metric-value">{match_score}</div>
             </div>
@@ -361,7 +507,7 @@ def render_report():
     avg_score = sum([e['score'] for e in evals]) / len(evals)
     
     st.markdown(f"""
-    <div class="metric-card">
+    <div class="metric-card-accent">
         <div class="metric-label">整体表现得分</div>
         <div class="metric-value">{avg_score:.1f}</div>
     </div>
