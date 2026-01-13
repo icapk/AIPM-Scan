@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自定义样式 - Apple 风格简约设计
+# 自定义样式 - 高端简约设计 (Glassmorphism + Apple 风格)
 st.markdown("""
 <style>
     /* === 全局样式 === */
@@ -34,46 +34,75 @@ st.markdown("""
     
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
     
     .stApp {
-        background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background-attachment: fixed;
+    }
+    
+    /* === 主内容区玻璃效果 === */
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2rem 3rem;
+        margin: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     
     /* === 侧边栏 === */
     section[data-testid="stSidebar"] {
-        background: #ffffff;
-        border-right: 1px solid #e5e5e7;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
-    section[data-testid="stSidebar"] .stMarkdown {
+    section[data-testid="stSidebar"] > div {
+        padding-top: 2rem;
+    }
+    section[data-testid="stSidebar"] .stMarkdown h3 {
         color: #1d1d1f;
+        font-weight: 600;
+        margin-bottom: 1rem;
     }
     
     /* === 主标题 === */
     .main-header {
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 700;
-        letter-spacing: -0.02em;
-        color: #1d1d1f;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         text-align: center;
         margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
     }
     .sub-header {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 400;
-        color: #86868b;
+        color: #6b7280;
         text-align: center;
         margin-bottom: 2.5rem;
     }
     
-    /* === 卡片样式 === */
+    /* === 卡片样式 (玻璃态) === */
     .metric-card {
-        background: #ffffff;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
         padding: 2rem;
-        border-radius: 18px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
         text-align: center;
-        border: 1px solid rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
     }
     .metric-value {
         font-size: 3.5rem;
@@ -82,45 +111,51 @@ st.markdown("""
         letter-spacing: -0.02em;
     }
     .metric-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #86868b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6b7280;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
         margin-bottom: 0.5rem;
     }
     
     /* === 强调卡片 (渐变) === */
     .metric-card-accent {
-        background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 2rem;
-        border-radius: 18px;
+        border-radius: 20px;
         text-align: center;
         color: white;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .metric-card-accent:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
     }
     .metric-card-accent .metric-value {
         color: white;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
     .metric-card-accent .metric-label {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.9);
     }
     
     /* === 按钮样式 === */
     .stButton > button {
-        background: #007aff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 0.75rem 2rem;
+        border-radius: 14px;
+        padding: 0.85rem 2.5rem;
         font-weight: 600;
         font-size: 1rem;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
     .stButton > button:hover {
-        background: #0056b3;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
     }
     .stButton > button:active {
         transform: translateY(0);
@@ -128,47 +163,59 @@ st.markdown("""
     
     /* === 文本输入框 === */
     .stTextArea textarea, .stTextInput input {
-        border: 1px solid #d2d2d7;
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 14px;
         padding: 1rem;
         font-size: 1rem;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.3s ease;
     }
     .stTextArea textarea:focus, .stTextInput input:focus {
-        border-color: #007aff;
-        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        background: white;
     }
     
     /* === 进度条 === */
     .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, #007aff, #5856d6);
+        background: linear-gradient(90deg, #667eea, #764ba2);
         border-radius: 10px;
     }
     
     /* === 警告/成功/错误框 === */
     .stAlert {
-        border-radius: 12px;
+        border-radius: 14px;
         border: none;
+        backdrop-filter: blur(10px);
     }
     
     /* === 选择框和滑块 === */
-    .stSelectbox > div > div, .stSlider > div {
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
     }
     
-    /* === 分隔线 === */
-    hr {
-        border: none;
-        height: 1px;
-        background: #e5e5e7;
-        margin: 2rem 0;
+    /* === 标签页 === */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 10px;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.5);
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
     }
     
     /* === 展开器 === */
     .streamlit-expanderHeader {
         font-weight: 600;
         color: #1d1d1f;
-        border-radius: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.5);
     }
     
     /* === 隐藏 Streamlit 默认元素 === */
@@ -176,10 +223,22 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
+    /* === Markdown 标题美化 === */
+    h1, h2, h3 {
+        color: #1d1d1f;
+        font-weight: 600;
+    }
+    h3 {
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        margin-bottom: 1rem;
+    }
+    
     /* === 响应式调整 === */
     @media (max-width: 768px) {
-        .main-header { font-size: 2rem; }
+        .main-header { font-size: 2.2rem; }
         .metric-value { font-size: 2.5rem; }
+        .main .block-container { padding: 1rem; margin: 0.5rem; }
     }
 </style>
 """, unsafe_allow_html=True)
