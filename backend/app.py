@@ -596,18 +596,59 @@ def render_history():
     
     db = get_db_session()
     interviews = history_service.get_all_interviews(db)
-    db.close()
     
     if not interviews:
         st.info("暂无历史记录")
+        db.close()
         return
         
-    for i in interviews:
-        with st.expander(f"{i.created_at.strftime('%Y-%m-%d %H:%M')} - {i.job_title} ({i.company_scale})"):
-            st.write(f"ID: {i.id}")
-            # In a real app, clicking here would load the details.
-            # MVP: Just show basic info
-            st.info("（详细报告查看功能开发中...）")
+    for interview in interviews:
+        with st.expander(f"{interview.created_at.strftime('%Y-%m-%d %H:%M')} - {interview.job_title} ({interview.company_scale})"):
+            # 基本信息
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**岗位**: {interview.job_title}")
+                st.markdown(f"**公司规模**: {interview.company_scale}")
+            with col2:
+                if interview.overall_score:
+                    st.markdown(f"**综合得分**: {interview.overall_score:.1f}")
+            
+            # 显示每一轮次
+            for round_obj in interview.rounds:
+                st.markdown(f"---")
+                st.markdown(f"#### 🎙️ 第 {round_obj.round_number} 轮面试")
+                
+                # 显示每道题目
+                for q in round_obj.questions:
+                    with st.container():
+                        # 题目
+                        st.markdown(f"**[{q.difficulty}] {q.text}**")
+                        
+                        # 用户回答
+                        if q.answer:
+                            st.markdown(f"💬 **候选人回答**: {q.answer[:200]}..." if len(q.answer or '') > 200 else f"💬 **候选人回答**: {q.answer}")
+                        else:
+                            st.markdown("💬 **候选人回答**: (未作答)")
+                        
+                        # 评估结果
+                        if q.score is not None:
+                            score_color = "🟢" if q.score >= 7 else ("🟡" if q.score >= 5 else "🔴")
+                            st.markdown(f"{score_color} **得分**: {q.score}/10")
+                            
+                            # 如果有详细评估
+                            if q.evaluation_json:
+                                eval_data = q.evaluation_json
+                                if isinstance(eval_data, dict):
+                                    strengths = eval_data.get("strengths", [])
+                                    weaknesses = eval_data.get("weaknesses", [])
+                                    if strengths:
+                                        st.success("✅ " + " | ".join(strengths[:3]))
+                                    if weaknesses:
+                                        st.warning("⚠️ " + " | ".join(weaknesses[:3]))
+                        
+                        st.markdown("")  # 间距
+    
+    db.close()
 
 # --- Main ---
 
