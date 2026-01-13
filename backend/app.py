@@ -2,6 +2,14 @@
 AIPM-Scan Streamlit 应用
 AI 产品经理能力识别与评估系统
 """
+import sys
+import os
+
+# 确保 backend 目录在 Python 路径中（解决 Streamlit Cloud 上的导入问题）
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+if _current_dir not in sys.path:
+    sys.path.insert(0, _current_dir)
+
 import streamlit as st
 import pandas as pd
 import asyncio
