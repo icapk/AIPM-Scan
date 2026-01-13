@@ -12,11 +12,14 @@ from services.question_generator import generate_questions
 from services.evaluator import evaluate_answer
 from services.history_service import history_service
 from config import ABILITY_DIMENSIONS
-from database import init_db, SessionLocal
+from database import init_db, SessionLocal, is_db_available
 from models.schemas import CompanyScale
 
-# 初始化数据库
-init_db()
+# 初始化数据库（带错误处理，失败时应用仍可运行）
+try:
+    init_db()
+except Exception as e:
+    print(f"数据库初始化失败: {e}")
 
 # 页面配置
 st.set_page_config(
@@ -594,61 +597,69 @@ def render_report():
 def render_history():
     st.markdown("### 📜 历史面试记录")
     
-    db = get_db_session()
-    interviews = history_service.get_all_interviews(db)
-    
-    if not interviews:
-        st.info("暂无历史记录")
-        db.close()
+    # 检查数据库是否可用
+    if not is_db_available():
+        st.warning("⚠️ 数据库连接失败，历史记录功能暂不可用。\n\n请检查 DATABASE_URL 配置是否正确。")
         return
-        
-    for interview in interviews:
-        with st.expander(f"{interview.created_at.strftime('%Y-%m-%d %H:%M')} - {interview.job_title} ({interview.company_scale})"):
-            # 基本信息
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"**岗位**: {interview.job_title}")
-                st.markdown(f"**公司规模**: {interview.company_scale}")
-            with col2:
-                if interview.overall_score:
-                    st.markdown(f"**综合得分**: {interview.overall_score:.1f}")
-            
-            # 显示每一轮次
-            for round_obj in interview.rounds:
-                st.markdown(f"---")
-                st.markdown(f"#### 🎙️ 第 {round_obj.round_number} 轮面试")
-                
-                # 显示每道题目
-                for q in round_obj.questions:
-                    with st.container():
-                        # 题目
-                        st.markdown(f"**[{q.difficulty}] {q.text}**")
-                        
-                        # 用户回答
-                        if q.answer:
-                            st.markdown(f"💬 **候选人回答**: {q.answer[:200]}..." if len(q.answer or '') > 200 else f"💬 **候选人回答**: {q.answer}")
-                        else:
-                            st.markdown("💬 **候选人回答**: (未作答)")
-                        
-                        # 评估结果
-                        if q.score is not None:
-                            score_color = "🟢" if q.score >= 7 else ("🟡" if q.score >= 5 else "🔴")
-                            st.markdown(f"{score_color} **得分**: {q.score}/10")
-                            
-                            # 如果有详细评估
-                            if q.evaluation_json:
-                                eval_data = q.evaluation_json
-                                if isinstance(eval_data, dict):
-                                    strengths = eval_data.get("strengths", [])
-                                    weaknesses = eval_data.get("weaknesses", [])
-                                    if strengths:
-                                        st.success("✅ " + " | ".join(strengths[:3]))
-                                    if weaknesses:
-                                        st.warning("⚠️ " + " | ".join(weaknesses[:3]))
-                        
-                        st.markdown("")  # 间距
     
-    db.close()
+    try:
+        db = get_db_session()
+        interviews = history_service.get_all_interviews(db)
+        
+        if not interviews:
+            st.info("暂无历史记录")
+            db.close()
+            return
+        
+        for interview in interviews:
+            with st.expander(f"{interview.created_at.strftime('%Y-%m-%d %H:%M')} - {interview.job_title} ({interview.company_scale})"):
+                # 基本信息
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"**岗位**: {interview.job_title}")
+                    st.markdown(f"**公司规模**: {interview.company_scale}")
+                with col2:
+                    if interview.overall_score:
+                        st.markdown(f"**综合得分**: {interview.overall_score:.1f}")
+                
+                # 显示每一轮次
+                for round_obj in interview.rounds:
+                    st.markdown(f"---")
+                    st.markdown(f"#### 🎙️ 第 {round_obj.round_number} 轮面试")
+                    
+                    # 显示每道题目
+                    for q in round_obj.questions:
+                        with st.container():
+                            # 题目
+                            st.markdown(f"**[{q.difficulty}] {q.text}**")
+                            
+                            # 用户回答
+                            if q.answer:
+                                st.markdown(f"💬 **候选人回答**: {q.answer[:200]}..." if len(q.answer or '') > 200 else f"💬 **候选人回答**: {q.answer}")
+                            else:
+                                st.markdown("💬 **候选人回答**: (未作答)")
+                            
+                            # 评估结果
+                            if q.score is not None:
+                                score_color = "🟢" if q.score >= 7 else ("🟡" if q.score >= 5 else "🔴")
+                                st.markdown(f"{score_color} **得分**: {q.score}/10")
+                                
+                                # 如果有详细评估
+                                if q.evaluation_json:
+                                    eval_data = q.evaluation_json
+                                    if isinstance(eval_data, dict):
+                                        strengths = eval_data.get("strengths", [])
+                                        weaknesses = eval_data.get("weaknesses", [])
+                                        if strengths:
+                                            st.success("✅ " + " | ".join(strengths[:3]))
+                                        if weaknesses:
+                                            st.warning("⚠️ " + " | ".join(weaknesses[:3]))
+                            
+                            st.markdown("")  # 间距
+        
+        db.close()
+    except Exception as e:
+        st.error(f"加载历史记录失败: {e}")
 
 # --- Main ---
 

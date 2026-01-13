@@ -148,9 +148,27 @@ class QuestionRecord(Base):
 
 # --- Utils ---
 
+# 数据库可用性标志
+_db_available = None
+
 def init_db():
-    """初始化数据库表"""
-    Base.metadata.create_all(bind=engine)
+    """初始化数据库表，带错误处理"""
+    global _db_available
+    try:
+        Base.metadata.create_all(bind=engine)
+        _db_available = True
+        print("[DB] 数据库初始化成功")
+    except Exception as e:
+        _db_available = False
+        print(f"[DB] 数据库初始化失败: {e}")
+        # 不抛出异常，让应用继续运行（历史记录功能将不可用）
+
+def is_db_available() -> bool:
+    """检查数据库是否可用"""
+    global _db_available
+    if _db_available is None:
+        init_db()
+    return _db_available
 
 def get_db():
     """依赖项：获取数据库会话"""
