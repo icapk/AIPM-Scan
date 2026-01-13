@@ -47,8 +47,19 @@ if is_sqlite:
         connect_args={"check_same_thread": False}  # SQLite 特定配置
     )
 else:
-    # PostgreSQL 或其他数据库
-    engine = create_engine(DATABASE_URL)
+    # PostgreSQL (Supabase) - 需要 SSL
+    # 如果 URL 中没有 sslmode 参数，添加它
+    db_url = DATABASE_URL
+    if "sslmode" not in db_url:
+        separator = "&" if "?" in db_url else "?"
+        db_url = f"{db_url}{separator}sslmode=require"
+    
+    engine = create_engine(
+        db_url,
+        pool_pre_ping=True,  # 自动检测断开的连接
+        pool_size=5,
+        max_overflow=10
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
