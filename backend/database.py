@@ -1,6 +1,6 @@
 """
 数据库连接与模型定义
-使用 SQLite + SQLAlchemy
+支持 PostgreSQL (云端) 和 SQLite (本地开发)
 """
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float, Text, ForeignKey, JSON, DateTime, Enum as SAEnum
@@ -10,14 +10,46 @@ from datetime import datetime
 from config import BASE_DIR
 import enum
 
-# 数据库文件路径
-DB_PATH = os.path.join(BASE_DIR, "aipm.db")
-DATABASE_URL = f"sqlite:///{DB_PATH}"
 
-engine = create_engine(
-    DATABASE_URL, 
-    connect_args={"check_same_thread": False} # SQLite 特定配置
-)
+def get_database_url() -> str:
+    """
+    获取数据库连接 URL
+    优先级：环境变量 > Streamlit secrets > SQLite 本地文件
+    """
+    # 1. 先检查环境变量
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url:
+        return db_url
+    
+    # 2. 再检查 Streamlit secrets
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and "DATABASE_URL" in st.secrets:
+            return st.secrets["DATABASE_URL"]
+    except Exception:
+        pass
+    
+    # 3. 回退到本地 SQLite
+    db_path = os.path.join(BASE_DIR, "aipm.db")
+    return f"sqlite:///{db_path}"
+
+
+# 获取数据库 URL
+DATABASE_URL = get_database_url()
+
+# 判断是否为 SQLite（需要特殊配置）
+is_sqlite = DATABASE_URL.startswith("sqlite")
+
+# 创建引擎
+if is_sqlite:
+    engine = create_engine(
+        DATABASE_URL, 
+        connect_args={"check_same_thread": False}  # SQLite 特定配置
+    )
+else:
+    # PostgreSQL 或其他数据库
+    engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
