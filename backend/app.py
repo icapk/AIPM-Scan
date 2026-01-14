@@ -37,11 +37,27 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自定义样式 - 高端简约设计 (Glassmorphism + Apple 风格)
+# 自定义样式 - 清爽简约设计 (参考 Teal 主题)
 st.markdown("""
 <style>
     /* === 全局样式 === */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+        --primary: #00B8A9;
+        --primary-dark: #00a399;
+        --primary-light: #e6f7f6;
+        --text-dark: #1a1a2e;
+        --text-muted: #6b7280;
+        --bg-main: #f8f9fb;
+        --bg-card: #ffffff;
+        --border-color: #e5e7eb;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+    }
     
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -49,104 +65,162 @@ st.markdown("""
     }
     
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        background-attachment: fixed;
+        background: var(--bg-main);
     }
     
-    /* === 主内容区玻璃效果 === */
+    /* === 主内容区 === */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 24px;
-        padding: 2rem 3rem;
-        margin: 1rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem 3rem;
+        margin: 1.5rem auto;
+        max-width: 900px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
     }
     
     /* === 侧边栏 === */
     section[data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        background: var(--bg-card);
+        border-right: 1px solid var(--border-color);
     }
     section[data-testid="stSidebar"] > div {
-        padding-top: 2rem;
-    }
-    section[data-testid="stSidebar"] .stMarkdown h3 {
-        color: #1d1d1f;
-        font-weight: 600;
-        margin-bottom: 1rem;
+        padding: 1rem 0.8rem;
     }
     
     /* === 主标题 === */
-    .main-header {
-        font-size: 3.5rem;
+    .main-title {
+        font-size: 1.8rem;
         font-weight: 700;
-        letter-spacing: -0.03em;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--text-dark);
         text-align: center;
         margin-bottom: 0.5rem;
-        text-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
     }
-    .sub-header {
-        font-size: 1.2rem;
+    .sub-title {
+        font-size: 0.95rem;
         font-weight: 400;
-        color: #6b7280;
+        color: var(--text-muted);
         text-align: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
     
-    /* === 卡片样式 (玻璃态) === */
-    .metric-card {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    }
-    .metric-value {
-        font-size: 3.5rem;
-        font-weight: 700;
-        color: #1d1d1f;
-        letter-spacing: -0.02em;
-    }
-    .metric-label {
-        font-size: 0.85rem;
+    /* === 步骤编号 === */
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
+        margin-right: 10px;
+    }
+    .step-title {
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.8rem;
+    }
+    .step-hint {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+    
+    /* === 上传区域 === */
+    .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 2.5rem;
+        text-align: center;
+        background: var(--bg-main);
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .upload-area:hover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+    .upload-icon {
+        font-size: 1.5rem;
+        color: var(--text-muted);
         margin-bottom: 0.5rem;
     }
+    .upload-text {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
     
-    /* === 强调卡片 (渐变) === */
+    /* === 卡片式选择 === */
+    .mode-card {
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 1.2rem 1.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: var(--bg-card);
+    }
+    .mode-card:hover {
+        border-color: var(--primary);
+    }
+    .mode-card.active {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+    .mode-card .mode-icon {
+        font-size: 1.2rem;
+        margin-right: 0.8rem;
+    }
+    .mode-card .mode-title {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    .mode-card .mode-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .mode-card .check-icon {
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+    
+    /* === 指标卡片 === */
+    .metric-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
     .metric-card-accent {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem;
-        border-radius: 20px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
         text-align: center;
         color: white;
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 184, 169, 0.3);
     }
-    .metric-card-accent:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
     }
     .metric-card-accent .metric-value {
         color: white;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    .metric-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.3rem;
     }
     .metric-card-accent .metric-label {
         color: rgba(255, 255, 255, 0.9);
@@ -154,19 +228,20 @@ st.markdown("""
     
     /* === 按钮样式 === */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary);
         color: white;
         border: none;
-        border-radius: 14px;
-        padding: 0.85rem 2.5rem;
+        border-radius: var(--radius-md);
+        padding: 0.9rem 2rem;
         font-weight: 600;
         font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 184, 169, 0.3);
     }
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 184, 169, 0.4);
     }
     .stButton > button:active {
         transform: translateY(0);
@@ -174,59 +249,105 @@ st.markdown("""
     
     /* === 文本输入框 === */
     .stTextArea textarea, .stTextInput input {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        border-radius: 14px;
-        padding: 1rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.9rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
     }
     .stTextArea textarea:focus, .stTextInput input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 184, 169, 0.15);
+    }
+    
+    /* === Slider 滑块 === */
+    .stSlider > div > div > div > div {
+        background: var(--primary) !important;
+    }
+    .stSlider > div > div > div > div > div {
+        background: var(--primary) !important;
     }
     
     /* === 进度条 === */
     .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
         border-radius: 10px;
     }
     
-    /* === 警告/成功/错误框 === */
-    .stAlert {
-        border-radius: 14px;
-        border: none;
-        backdrop-filter: blur(10px);
-    }
-    
-    /* === 选择框和滑块 === */
+    /* === 选择框 === */
     .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 12px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--bg-card);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
     }
     
-    /* === 标签页 === */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+    /* === 信息框 === */
+    .stAlert {
+        border-radius: var(--radius-md);
+        border: none;
     }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 10px;
-        padding: 10px 20px;
-        background: rgba(255, 255, 255, 0.5);
+    
+    /* === 侧边栏按钮 === */
+    .sidebar-btn {
+        display: flex;
+        align-items: center;
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.3rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-size: 0.9rem;
+        color: var(--text-dark);
     }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .sidebar-btn:hover {
+        background: var(--bg-main);
+    }
+    .sidebar-btn.active {
+        background: var(--primary-light);
+        color: var(--primary);
+        font-weight: 500;
+    }
+    .sidebar-btn-primary {
+        background: var(--primary);
         color: white;
+        font-weight: 500;
+        border-radius: var(--radius-sm);
+        padding: 0.7rem 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+    }
+    .sidebar-btn-primary:hover {
+        background: var(--primary-dark);
     }
     
-    /* === 展开器 === */
-    .streamlit-expanderHeader {
-        font-weight: 600;
-        color: #1d1d1f;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.5);
+    /* === 历史记录项 === */
+    .history-item {
+        padding: 0.6rem 0.8rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.3rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        transition: all 0.15s ease;
+    }
+    .history-item:hover {
+        background: var(--bg-main);
+    }
+    .history-item .tag {
+        background: var(--primary);
+        color: white;
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+    }
+    
+    /* === 分割线 === */
+    .divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 1rem 0;
     }
     
     /* === 隐藏 Streamlit 默认元素 === */
@@ -234,22 +355,24 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* === Markdown 标题美化 === */
+    /* === 标题 === */
     h1, h2, h3 {
-        color: #1d1d1f;
+        color: var(--text-dark);
         font-weight: 600;
     }
-    h3 {
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        margin-bottom: 1rem;
+    
+    /* === 展开器 === */
+    .streamlit-expanderHeader {
+        font-weight: 500;
+        color: var(--text-dark);
+        border-radius: var(--radius-sm);
+        background: var(--bg-main);
     }
     
-    /* === 响应式调整 === */
+    /* === 响应式 === */
     @media (max-width: 768px) {
-        .main-header { font-size: 2.2rem; }
-        .metric-value { font-size: 2.5rem; }
-        .main .block-container { padding: 1rem; margin: 0.5rem; }
+        .main-title { font-size: 1.5rem; }
+        .main .block-container { padding: 1.5rem; margin: 0.5rem; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -324,77 +447,122 @@ def render_sidebar():
                     st.markdown(f"　{v}")
 
 def render_setup():
-    st.markdown('<p class="main-header">🎯 AIPM-Scan Pro</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">基于 RAG 的 AI 产品经理深度评估系统</p>', unsafe_allow_html=True)
+    # 标题
+    st.markdown('<p class="main-title">开启新的模拟面试</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title">配置您的简历和目标岗位，AI 面试官将为您量身定制面试问题</p>', unsafe_allow_html=True)
+    
+    # Step 1: 上传简历
+    st.markdown('''
+    <div class="step-title">
+        <span class="step-number">1</span>
+        上传简历 (可选)
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    resume_text = st.text_area(
+        "粘贴简历内容",
+        height=120,
+        placeholder="粘贴您的简历内容，或留空仅基于 JD 生成面试题...",
+        label_visibility="collapsed"
+    )
+    
+    st.markdown('<div style="height: 1rem"></div>', unsafe_allow_html=True)
+    
+    # Step 2: 目标岗位
+    st.markdown('''
+    <div class="step-title">
+        <span class="step-number">2</span>
+        目标岗位
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    jd_text = st.text_area(
+        "职位描述",
+        height=150,
+        placeholder="例如：高级 AI 产品经理，要求熟悉 LLM 应用和 RAG 架构...",
+        value="""岗位职责:
+1.负责AI智能客服工具全生命周期规划、设计与迭代
+2.挖掘B端客户客服痛点，结合大模型/RAG技术落地
+
+任职要求:
+1.对AI技术有深刻理解，具备敏锐的市场洞察力
+2.有B端的SaaS产品经验，AI客服/智能交互产品核心经验""",
+        label_visibility="collapsed"
+    )
+    
+    # 公司信息 (可选)
+    st.markdown('<p class="step-hint">选填：公司信息</p>', unsafe_allow_html=True)
+    company_info = st.text_input(
+        "公司信息",
+        placeholder="大厂、创业公司、外企等（主要业务、规模大小）",
+        label_visibility="collapsed"
+    )
+    st.markdown('<p style="font-size: 0.8rem; color: #9ca3af; margin-top: 0.3rem;">提供公司信息可以让面试题目更贴近实际场景</p>', unsafe_allow_html=True)
+    
+    st.markdown('<div style="height: 1rem"></div>', unsafe_allow_html=True)
+    
+    # Step 3: 面试问题数量
+    st.markdown('''
+    <div class="step-title">
+        <span class="step-number">3</span>
+        面试问题数量 (3-10)
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    col_slider, col_value = st.columns([5, 1])
+    with col_slider:
+        st.session_state.questions_per_round = st.slider(
+            "问题数量",
+            min_value=3,
+            max_value=10,
+            value=st.session_state.questions_per_round,
+            label_visibility="collapsed"
+        )
+    with col_value:
+        st.markdown(f'<div style="text-align: center; font-size: 1.5rem; font-weight: 600; color: #00B8A9; padding-top: 0.5rem;">{st.session_state.questions_per_round}</div>', unsafe_allow_html=True)
+    
+    st.markdown('<p style="font-size: 0.8rem; color: #9ca3af;">建议设置为 5 个问题，既能充分展示能力，又不会过于疲劳</p>', unsafe_allow_html=True)
+    
+    st.markdown('<div style="height: 1rem"></div>', unsafe_allow_html=True)
+    
+    # Step 4: 面试模式
+    st.markdown('''
+    <div class="step-title">
+        <span class="step-number">4</span>
+        面试模式
+    </div>
+    ''', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 📄 职位描述 (JD)")
-        jd_text = st.text_area("粘贴职位描述", height=300, value="""岗位职责:
-1.负责AI智能客服工具(对标LiveChat/
-Smartsalely等)全生命周期规划、设计与迭代，聚焦全渠道交互、AI对话引擎、工单自动化等核心功能设计。
-2.挖掘B端客户客服痛点，结合大模型/RAG技术，落地"降本增效+客户体验"双目标。
-3.跨团队协同算法/研发/设计，推动产品迭代与技术落地，数据驱动优化。
-4.构建并维护与关键用户及合作伙伴的关系，收集反馈，持续改进产品体验。
-任职要求:
-1.对AI技术有深刻理解，具备敏锐的市场洞察力。
-2.优秀的项目管理能力，能够有效协调团队工作，推动项目落地。
-3.有B端的SaaS产品经验，AI客服/智能交互产品核心经验。
-4.熟悉LiveChat/HelpShift等竞品，理解大模型、意图识别等AI技术原理。""")
-    
+        st.markdown('''
+        <div class="mode-card active" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center;">
+                <span class="mode-icon">💬</span>
+                <div>
+                    <div class="mode-title">文字对话</div>
+                    <div class="mode-desc">打字回答问题</div>
+                </div>
+            </div>
+            <span class="check-icon">✓</span>
+        </div>
+        ''', unsafe_allow_html=True)
     with col2:
-        st.markdown("### 👤 候选人简历")
-        resume_text = st.text_area("粘贴简历内容 (可选)", height=300, value="""个人总结：
-1.熟悉从Prompt Engineering到模型评估的全链路 AI 产品设计，具备数据飞轮和Bad Case 优化的实战经验。
-2.熟悉 LLM 应用、RAG 知识检索、私有化部署 等 AI 技术栈，能结合业务需求进行技术选型与落地。
-3.主导过 千万级营收的 AI 标书助手 与 500 万元商业化闭环的智慧场馆 SaaS，具备从 战略规划 → 产品设计 → 技术实现 → 商业化 的全链路经验。
-
-工作经历： 
-2025.04-至今                戴思乐科技集团有限公司                  岗位：AI产品经理
-核心成果：企业级 AI 标书助手落地，创造千万级营收增长空间
-1.通过 LLM+RAG 架构，将传统标书制作的知识密集型工作转化为高效自动化流程，驱动投标部效率提升 50% 。
-2.主导技术选型，基于 DeepSeek-V2 决策，平衡模型性能与私有化部署成本，确保了企业数据安全和项目快速交付 。
-3.构建 Bad Case 闭环优化机制，将用户反馈转化为结构化数据，驱动算法与数据策略迭代，通过精准标注和回流，持续提升模型准确率和内容质量，确保产品的高可用性与持续进化 。
-
-2022.07-至今                戴思乐科技集团有限公司                  岗位：产品经理
-核心成果：乐泳智慧场馆 SaaS 系统商业化闭环
-从0到1构建“乐泳”智慧场馆SaaS产品体系，并完成商业化闭环。颠覆性地引入掌静脉生物识别技术，重构“刷掌入场-储物-消费”全链路无人化服务，独立负责完成从竞品分析、原型设计到项目交付的全流程。产品上线后迅速占据市场，截止目前累计实现商业化收入500万元，为单个场馆年均节约10万元管理与耗材成本。
-
-2018.03-2022.07     深圳市金财全文化发展有限公司            岗位：运营
-·  负责教育类产品的运营，提升曝光与转化。
-· 策划学员课程与品牌峰会，提升用户粘性与市场影响力。
-
-2017.03-2017.12          深圳旭辉信息技术有限公司             岗位：测试
-负责访客机系统的软硬件测试，售前及技术支持工作。
-
-项目经验：
-AI标书助手（LLM+RAG）         AI产品经理                     2025.04 - 至今         
-【项目名称】：AI标书助手
-【项目背景】：为打破传统标书制作“高耗时、低效率”的业务瓶颈，主导设计并落地了基于LLM与RAG架构的AI标书助手。项目旨在重构内容生产流程，将投标能力转化为企业的核心竞争壁垒。
-【工作内容】：
-1.战略定位： 主导0-1产品规划，通过市场与竞品分析，精准定位“AI生成标书”为战略突破口。 
-2.技术选型： 负责核心技术方案评估，决策采用DeepSeek-V2模型及私有化部署方案，为产品性能与数据安全奠定基石。 
-3.产品设计： 独立负责产品架构与PRD撰写，通过精密的Prompt工程优化RAG内容生成逻辑，推动产品3个月内成功上线。 
-4.迭代优化： 构建Bad Case闭环优化机制，驱动算法与数据策略迭代，确保产品高可用性与持续进化。 
-5.商业规划： 制定清晰的商业化蓝图，规划以“会员年费”与“私有化部署”模式切入B端市场，开辟新营收曲线。 主要成果：
-【项目成果】：
-1.效率提升： 驱动投标部标书制作效率提升50%，人均产出提升1.5倍。 
-2.营收赋能： 赋能团队年增产120份标书，创造千万级营收增长潜力。 
-3.极速落地： 3个月内完成从0到1的AI产品完整交付。
-
-乐泳体育                            产品经理                                     2022.07 - 至今         
-【项目名称】：游泳馆SaaS系统 
-【项目背景】：利用新兴技术【掌静脉】替代手环作为身份识别方案，配合客户/票务管理系统，C端客户直接刷掌开闸、储物，无需专人管理、发放手环，减少手环丢失的成本，提升客户体验及游泳馆运营管理效率，降低运营管理难度和管理成本。
-【工作内容】：
-1.需求分析：项目前期对4家游泳馆举行实地采访调查，线下（游泳馆）线上（微信），与5位游泳馆运营负责人及店长分别沟通整理需求，做资料分类汇总和用户的核心需求梳理以及优先排序结果；
-2.竞品分析：对“菠菜”、“勤鸟”、“微健”三个竞品进行产品分析，主要对“会员管理”和“财务报表”两个板块进行比较分析；
-3.产品设计：使用 墨刀 做主线核心功能的流程图，经过用户需求调研创新设计了游泳馆后台管理功能的具体实现流程和场景需求分析。独立负责整个项目的原型设计工作，使用墨刀工具共计设计48个原型页面；
-4.需求文档：负责撰写PRD需求文档，以方便研发和UI后续工作；
-5.产品规划：与老板以及公司高层共同制定产品一期、二期计划，并确定各产品优先级与实施计划；
-【项目成果】：根据微信官方数据统计，场馆智慧化升级后，刷掌进场的客户使用率达到90%，复用率达到99%，为每个场馆平均节约2名人力成本，多维度报表为场馆运营策略、财务管理功能提供有力的数据支持。""")
-
-    if st.button("🚀 开始解析与匹配", type="primary", use_container_width=True):
-        if len(jd_text) < 50:
+        st.markdown('''
+        <div class="mode-card" style="display: flex; align-items: center; opacity: 0.5;">
+            <span class="mode-icon">🎙️</span>
+            <div>
+                <div class="mode-title">语音对话</div>
+                <div class="mode-desc">即将推出</div>
+            </div>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    st.markdown('<div style="height: 1.5rem"></div>', unsafe_allow_html=True)
+    
+    # 开始面试按钮
+    if st.button("🚀 开始面试", type="primary", use_container_width=True):
+        if len(jd_text) < 30:
             st.error("JD 内容太短，请提供更多信息")
             return
             
@@ -427,6 +595,8 @@ AI标书助手（LLM+RAG）         AI产品经理                     202
                     st.error("解析失败")
             except Exception as e:
                 st.error(f"发生错误: {str(e)}")
+
+
 
 def render_profile_view():
     st.markdown("### 📊 岗位与人才匹配分析")
